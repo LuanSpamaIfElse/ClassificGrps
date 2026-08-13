@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classificação de Grupos - Agosto</title>
+<style>
+  :root{
+    --bg:#0e1013;
+    --panel:#16191d;
+    --line:#262b31;
+    --text:#e7e9ec;
+    --muted:#8b9199;
+    --accent:#ff5c5c;
+    --accent-dim:#3a1414;
+    --mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--mono);
+    display:flex;
+    justify-content:center;
+    padding:40px 16px;
+  }
+  .card{
+    width:100%;
+    max-width:640px;
+  }
+  h1{
+    font-size:15px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 4px;
+  }
+  h1 span{color:var(--accent);}
+  .sub{
+    font-size:12px;
+    color:var(--muted);
+    margin:0 0 24px;
+  }
+  form{
+    display:flex;
+    align-items:flex-end;
+    gap:14px;
+    flex-wrap:wrap;
+    padding:16px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    margin-bottom:20px;
+  }
+  .field{display:flex;flex-direction:column;gap:6px;}
+  label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+  input{
+    background:#0b0d10;
+    border:1px solid var(--line);
+    color:var(--text);
+    font-family:var(--mono);
+    font-size:14px;
+    padding:8px 10px;
+    border-radius:4px;
+    width:90px;
+  }
+  input:focus{outline:none;border-color:var(--accent);}
+  button{
+    background:var(--accent);
+    color:#1a0a0a;
+    border:none;
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:13px;
+    letter-spacing:.04em;
+    padding:9px 18px;
+    border-radius:4px;
+    cursor:pointer;
+    text-transform:uppercase;
+  }
+  button:hover{filter:brightness(1.08);}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    border:1px solid var(--line);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  thead th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--muted);
+    background:var(--panel);
+    padding:10px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  tbody td{
+    padding:9px 14px;
+    font-size:13px;
+    border-bottom:1px solid var(--line);
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr.grupo70 td{
+    background:var(--accent-dim);
+    color:var(--accent);
+    font-weight:700;
+  }
+  .empty{
+    color:var(--muted);
+    font-size:12px;
+    padding:16px;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Classificação de Grupos <span>/ Agosto</span></h1>
+    <p class="sub">Informe o dia de instalação e o período para ver quais grupos migram para o Grupo 70.</p>
+
+    <form id="form">
+      <div class="field">
+        <label for="dia">Dia (agosto)</label>
+        <input id="dia" type="number" placeholder="ex: 8">
+      </div>
+      <div class="field">
+        <label for="periodo">Período (dias)</label>
+        <input id="periodo" type="number" value="15">
+      </div>
+      <button type="submit">Calcular</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr><th>Grupo</th><th>Status</th></tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="2" class="empty">Preencha os campos acima e clique em Calcular</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+<script>
+  // grupo -> dia de agosto (mesmos dados do script original)
+  const grupos = {
+    1:4, 2:5, 3:6, 4:7, 5:10, 6:11, 7:12, 8:13, 9:14, 10:17,
+    11:18, 12:19, 13:20, 14:21, 15:24, 16:25, 17:26, 18:27,
+    19:28, 20:29, 21:4, 22:4, 23:4, 26:28,
+    61:5, 62:6, 63:7, 64:10, 65:11, 66:12, 67:13, 68:14, 69:17
+  };
+
+  const form = document.getElementById('form');
+  const tbody = document.getElementById('tbody');
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    calcular();
+  });
+
+  function calcular(){
+    const hoje = parseInt(document.getElementById('dia').value, 10);
+    const periodo = parseInt(document.getElementById('periodo').value, 10);
+
+    if (Number.isNaN(hoje) || Number.isNaN(periodo)){
+      alert('Digite valores válidos (números).');
+      return;
+    }
+
+    tbody.innerHTML = '';
+    const gruposOrdenados = Object.keys(grupos).map(Number).sort((a,b)=>a-b);
+
+    for (const grupo of gruposOrdenados){
+      const diferenca = grupos[grupo] - hoje;
+      const isGrupo70 = diferenca >= 0 && diferenca <= periodo;
+      const tr = document.createElement('tr');
+      if (isGrupo70) tr.classList.add('grupo70');
+      tr.innerHTML = `<td>${grupo}</td><td>${isGrupo70 ? 'Grupo 70' : 'Mantém'}</td>`;
+      tbody.appendChild(tr);
+    }
+  }
+</script>
+</body>
+</html>
