@@ -109,6 +109,11 @@
     color:var(--accent);
     font-weight:700;
   }
+  tbody tr.lido td{
+    background:#123a1e;
+    color:#4ade80;
+    font-weight:700;
+  }
   .empty{
     color:var(--muted);
     font-size:12px;
@@ -130,6 +135,10 @@
       <div class="field">
         <label for="periodo">Período (dias)</label>
         <input id="periodo" type="number" value="15">
+      </div>
+      <div class="field">
+        <label for="diaHoje">Dia de hoje</label>
+        <input id="diaHoje" type="number" placeholder="ex: 12">
       </div>
       <button type="submit">Calcular</button>
     </form>
@@ -164,8 +173,9 @@
   function calcular(){
     const hoje = parseInt(document.getElementById('dia').value, 10);
     const periodo = parseInt(document.getElementById('periodo').value, 10);
+    const diaHoje = parseInt(document.getElementById('diaHoje').value, 10);
 
-    if (Number.isNaN(hoje) || Number.isNaN(periodo)){
+    if (Number.isNaN(hoje) || Number.isNaN(periodo) || Number.isNaN(diaHoje)){
       alert('Digite valores válidos (números).');
       return;
     }
@@ -174,11 +184,20 @@
     const gruposOrdenados = Object.keys(grupos).map(Number).sort((a,b)=>a-b);
 
     for (const grupo of gruposOrdenados){
-      const diferenca = grupos[grupo] - hoje;
-      const isGrupo70 = diferenca >= 0 && diferenca <= periodo;
       const tr = document.createElement('tr');
-      if (isGrupo70) tr.classList.add('grupo70');
-      tr.innerHTML = `<td>${grupo}</td><td>${isGrupo70 ? 'Grupo 70' : 'Mantém'}</td>`;
+      let status, tag;
+
+      if (grupos[grupo] === diaHoje){
+        status = 'Lido Hoje'; tag = 'lido';
+      } else {
+        const diferenca = grupos[grupo] - hoje;
+        const isGrupo70 = diferenca >= 0 && diferenca <= periodo;
+        status = isGrupo70 ? 'Grupo 70' : 'Mantém';
+        tag = isGrupo70 ? 'grupo70' : '';
+      }
+
+      if (tag) tr.classList.add(tag);
+      tr.innerHTML = `<td>${grupo}</td><td>${status}</td>`;
       tbody.appendChild(tr);
     }
   }
